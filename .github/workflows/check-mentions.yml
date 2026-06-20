@@ -1,0 +1,49 @@
+name: メンション通知
+
+on:
+  schedule:
+    # 5分おきに実行（GitHub Actions の最短間隔。時刻はUTC基準だが「間隔」なので影響なし）
+    - cron: "*/5 * * * *"
+  # 手動実行ボタンも用意（Actionsタブから今すぐ試せる）
+  workflow_dispatch:
+
+# 前の実行が終わる前に次を走らせない（状態ファイルの競合防止）
+concurrency:
+  group: mention-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 前回実行で保存した state.json を復元（無ければスキップ）
+      - name: 状態を復元
+        uses: actions/cache/restore@v4
+        with:
+          path: state.json
+          key: mention-state-${{ github.run_id }}
+          restore-keys: |
+            mention-state-
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: メンションを確認して通知
+        run: node src/index.js
+        env:
+          OC_EMAIL: ${{ secrets.OC_EMAIL }}
+          OC_PASSWORD: ${{ secrets.OC_PASSWORD }}
+          OC_ENTERPRISE_ID: ${{ secrets.OC_ENTERPRISE_ID }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+
+      # 更新後の state.json を次回のために保存
+      - name: 状態を保存
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state.json
+          key: mention-state-${{ github.run_id }}

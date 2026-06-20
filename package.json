@@ -1,0 +1,15 @@
+{
+  "name": "onclass-mention-line-notifier",
+  "version": "0.1.0",
+  "description": "オンラインクラスのメンション見逃しをLINEに通知するツール",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --env-file-if-exists=.env scripts/check.js",
+    "test-line": "node --env-file-if-exists=.env scripts/test-line.js",
+    "start": "node --env-file-if-exists=.env src/index.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}
