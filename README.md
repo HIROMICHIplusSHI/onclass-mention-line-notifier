@@ -3,6 +3,41 @@
 オンラインクラス（the-online-class）の**メンション見逃しを LINE で通知**するツール。
 GitHub Actions が5分おきに動き、新しいメンションがあれば LINE に届けます。PC を閉じていても動きます（無料）。
 
+## 🍴 フォークして使う人へ（まずこれ）
+
+このリポジトリを **Fork** したら、各自で設定しないと動きません。理由は次の2つです。
+
+- フォークしたリポジトリは **GitHub Actions が既定で無効**
+- **Secrets はフォークにコピーされない**（セキュリティのため）
+
+### 1. Actions を有効化する
+
+- リポジトリ上部の **Actions** タブを開く
+- **「I understand my workflows, go ahead and enable them」** をクリック
+
+### 2. 自分の Secrets を登録する
+
+**Settings → Secrets and variables → Actions → New repository secret** で、下の5つを自分の値で登録します（値の意味は[必要な値](#必要な値環境変数--github-secrets)を参照）。
+
+| 名前 | 内容 |
+|---|---|
+| `OC_EMAIL` | オンクラスのログインメール |
+| `OC_PASSWORD` | オンクラスのパスワード |
+| `OC_ENTERPRISE_ID` | 所属エンタープライズID |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE のチャネルアクセストークン |
+| `LINE_USER_ID` | LINE の User ID（未設定なら友だち全員に broadcast） |
+
+### 3. 手動でテスト実行
+
+- **Actions タブ → メンション通知 → Run workflow** を押す
+- 緑のチェックが付けば成功。以降は自動で回り始めます
+
+### 4. 自動運用の注意
+
+- 設定後は **5分おき（遅延あり）** に自動チェックされます
+- ⚠️ スケジュール実行は GitHub 側の都合で**数分〜十数分遅れる／たまにスキップ**されます（GitHub Actions の仕様。即時性より「見逃さない」が目的）
+- ⚠️ リポジトリに **60日間コミットが無いとスケジュールが自動停止**します。止まったら何かコミットすれば復活します
+
 ## 仕組み
 
 ```
